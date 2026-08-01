@@ -1,6 +1,6 @@
 package com.ugc.audit_service.service;
 
-import com.ugc.audit_service.kafka.event.TicketCreatedEvent;
+import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.audit_service.model.AuditRecord;
 import com.ugc.audit_service.repo.AuditRepo;
 import lombok.RequiredArgsConstructor;

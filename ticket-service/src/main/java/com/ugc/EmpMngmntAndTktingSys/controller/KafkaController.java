@@ -1,8 +1,8 @@
 package com.ugc.EmpMngmntAndTktingSys.controller;
 
-import com.ugc.EmpMngmntAndTktingSys.kafka.event.TicketCreatedEvent;
+import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.EmpMngmntAndTktingSys.kafka.producer.KafkaProducerService;
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
+import com.ugc.common.model.Priority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

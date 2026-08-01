@@ -5,7 +5,6 @@ import com.ugc.EmpMngmntAndTktingSys.DTO.CreateTicketRequest;
 import com.ugc.EmpMngmntAndTktingSys.DTO.TicketResponse;
 import com.ugc.EmpMngmntAndTktingSys.Security.JwtService;
 import com.ugc.EmpMngmntAndTktingSys.mapper.TicketMapper;
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.model.Ticket;
 import com.ugc.EmpMngmntAndTktingSys.service.TicketService;
 import org.junit.jupiter.api.Test;

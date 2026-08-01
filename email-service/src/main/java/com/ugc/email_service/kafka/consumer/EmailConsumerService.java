@@ -1,7 +1,7 @@
 package com.ugc.email_service.kafka.consumer;
 
-import com.ugc.email_service.kafka.KafkaTopics;
-import com.ugc.email_service.kafka.event.TicketCreatedEvent;
+import com.ugc.common.kafka.KafkaTopics;
+import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.email_service.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.BackOff;

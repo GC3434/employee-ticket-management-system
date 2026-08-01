@@ -1,6 +1,6 @@
 package com.ugc.EmpMngmntAndTktingSys.DTO;
 
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
+import com.ugc.common.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.model.TicketStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.ugc.EmpMngmntAndTktingSys.DTO;
 
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
+import com.ugc.common.model.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

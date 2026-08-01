@@ -1,14 +1,12 @@
 package com.ugc.EmpMngmntAndTktingSys.controller;
 
+import com.ugc.common.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.DTO.CreateTicketRequest;
 import com.ugc.EmpMngmntAndTktingSys.DTO.TicketResponse;
-import com.ugc.EmpMngmntAndTktingSys.mapper.TicketMapper;
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.model.TicketStatus;
 import com.ugc.EmpMngmntAndTktingSys.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

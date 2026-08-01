@@ -1,4 +1,4 @@
-package com.ugc.EmpMngmntAndTktingSys.model;
+package com.ugc.common.model;
 
 public enum Priority {
     LOW,

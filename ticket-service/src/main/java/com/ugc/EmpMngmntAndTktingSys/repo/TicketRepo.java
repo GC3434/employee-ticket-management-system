@@ -1,13 +1,12 @@
 package com.ugc.EmpMngmntAndTktingSys.repo;
 
-import com.ugc.EmpMngmntAndTktingSys.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.model.Ticket;
+import com.ugc.common.model.Priority;
 import com.ugc.EmpMngmntAndTktingSys.model.TicketStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface TicketRepo extends JpaRepository<Ticket, Long> {

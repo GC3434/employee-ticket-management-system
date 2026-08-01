@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.ugc.common.model.Priority;
 import java.time.LocalDateTime;
 
 @Entity

@@ -1,7 +1,7 @@
 package com.ugc.audit_service.kafka.consumer;
 
-import com.ugc.audit_service.kafka.KafkaTopics;
-import com.ugc.audit_service.kafka.event.TicketCreatedEvent;
+import com.ugc.common.kafka.KafkaTopics;
+import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.audit_service.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import org.springframework.kafka.annotation.BackOff;
 import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 @Service

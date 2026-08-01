@@ -1,6 +1,6 @@
-package com.ugc.email_service.kafka.event;
+package com.ugc.common.event;
 
-import com.ugc.email_service.model.Priority;
+import com.ugc.common.model.Priority;
 import lombok.*;
 
 @Data

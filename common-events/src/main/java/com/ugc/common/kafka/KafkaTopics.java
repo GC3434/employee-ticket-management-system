@@ -1,4 +1,4 @@
-package com.ugc.audit_service.kafka;
+package com.ugc.common.kafka;
 
 public final class KafkaTopics {
 

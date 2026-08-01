@@ -1,6 +1,6 @@
 package com.ugc.email_service.service;
 
-import com.ugc.email_service.kafka.event.TicketCreatedEvent;
+import com.ugc.common.event.TicketCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
