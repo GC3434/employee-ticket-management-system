@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/redis/**").permitAll()
                         .requestMatchers("/kafka/**").permitAll()
+                        .requestMatchers("/internal/**").permitAll()
                         .requestMatchers("/empNtkt/admin/**")
                         .hasRole("ADMIN")
 

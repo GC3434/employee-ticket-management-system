@@ -18,7 +18,7 @@ public class GatewayConfig {
     public RouterFunction<ServerResponse> userServiceRoutes() {
         return route("user-service")
                 .route(path("/auth/**"), http())
-                .filter(lb("USER_SERVICE"))
+                .filter(lb("USER-SERVICE"))
                 .build();
     }
     /*public RouterFunction<ServerResponse> userServiceRoutes() {
@@ -34,7 +34,7 @@ public class GatewayConfig {
     public RouterFunction<ServerResponse> ticketServiceRoutes(){
         return route("ticket-service")
                 .route(path("/tickets/**"),http())
-                .filter(lb("TICKET_SERVICE"))
+                .filter(lb("TICKET-SERVICE"))
                 .build();
     }
     /*public RouterFunction<ServerResponse> ticketServiceRoutes() {

@@ -1,7 +1,7 @@
 package com.ugc.EmpMngmntAndTktingSys.Security;
 
 import com.ugc.EmpMngmntAndTktingSys.DTO.UserResponse;
-import com.ugc.EmpMngmntAndTktingSys.client.UserClient;
+import com.ugc.EmpMngmntAndTktingSys.feign.UserClient;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String username = jwtService.extractUsername(jwt);
 
-        UserResponse user = userClient.getUserByUserName(username);
+        UserResponse user = userClient.getUserByUsername(username);
 
         List<GrantedAuthority> authorities =
                 user.getRoles()

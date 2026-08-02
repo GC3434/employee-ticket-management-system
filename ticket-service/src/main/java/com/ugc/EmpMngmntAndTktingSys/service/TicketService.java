@@ -3,7 +3,7 @@ package com.ugc.EmpMngmntAndTktingSys.service;
 import com.ugc.EmpMngmntAndTktingSys.DTO.CreateTicketRequest;
 import com.ugc.EmpMngmntAndTktingSys.DTO.TicketResponse;
 import com.ugc.EmpMngmntAndTktingSys.DTO.UserResponse;
-import com.ugc.EmpMngmntAndTktingSys.client.UserClient;
+import com.ugc.EmpMngmntAndTktingSys.feign.UserClient;
 import com.ugc.EmpMngmntAndTktingSys.exception.*;
 import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.EmpMngmntAndTktingSys.kafka.producer.KafkaProducerService;
@@ -35,7 +35,7 @@ public class TicketService {
 
         log.info("Creating ticket for user {}", username);
 
-        UserResponse user = userClient.getUserByUserName(username);
+        UserResponse user = userClient.getUserByUsername(username);
 
         Ticket ticket = new Ticket();
         ticket.setTitle(ticketRequest.getTitle());
@@ -71,7 +71,7 @@ public class TicketService {
 
         log.info("Fetching assigned tickets for user {}", userName);
 
-        UserResponse user = userClient.getUserByUserName(userName);
+        UserResponse user = userClient.getUserByUsername(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByAssignedToUserIdAndStatusIn(
@@ -93,7 +93,7 @@ public class TicketService {
 
         log.info("Fetching created tickets for user {}", userName);
 
-        UserResponse user = userClient.getUserByUserName(userName);
+        UserResponse user = userClient.getUserByUsername(userName);
 
         Page<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserId(user.getUserId(), pageable)
@@ -114,7 +114,7 @@ public class TicketService {
                 status,
                 userName);
 
-        UserResponse user = userClient.getUserByUserName(userName);
+        UserResponse user = userClient.getUserByUsername(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserIdAndStatus(user.getUserId(), status)
@@ -136,7 +136,7 @@ public class TicketService {
                 priority,
                 userName);
 
-        UserResponse user = userClient.getUserByUserName(userName);
+        UserResponse user = userClient.getUserByUsername(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserIdAndPriority(user.getUserId(), priority)
@@ -225,7 +225,7 @@ public class TicketService {
 
         log.info("User {} is attempting to resolve ticket {}", userName, ticketId);
 
-        UserResponse user = userClient.getUserByUserName(userName);
+        UserResponse user = userClient.getUserByUsername(userName);
         Long employeeId = user.getUserId();
 
         Ticket ticket = ticketRepo.findById(ticketId)
