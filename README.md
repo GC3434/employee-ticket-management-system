@@ -34,6 +34,7 @@ The system supports role-based access for **ADMIN, MANAGER, and EMPLOYEE**, tick
 ---
 
 ## 🏗️ Architecture
+![EmpNtkt Microservices Architecture](docs/architecture.png)
 
 ```
                          ┌──────────────────┐
