@@ -5,11 +5,21 @@
 # Maven
 target/
 
+# Node / React / Vite
+node_modules/
+frontend/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # macOS
 .DS_Store
 
 # Logs
 *.log
 
-# Environment
+# Environment / secrets
 .env
+.env.*
+!.env.example
