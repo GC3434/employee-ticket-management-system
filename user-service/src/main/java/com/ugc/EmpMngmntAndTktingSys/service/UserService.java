@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -81,6 +82,15 @@ public class UserService {
         return userMapper.mapToUserResponse(user);
     }
 
+    public List<UserResponse> getEmployees() {
+        return userRepo.findAll()
+                .stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getRoleName() == RoleType.ROLE_EMP))
+                .map(userMapper :: mapToUserResponse)
+                .toList();
+    }
+
     @CachePut(value = "users", key = "#id")
     public UserResponse updateUserById(Long id, UpdateUserRequest updateUserRequest) {
         User user = userRepo.findById(id)
@@ -99,4 +109,5 @@ public class UserService {
         userRepo.deleteById(id);
         return "deleted Successfully...";
     }
+
 }

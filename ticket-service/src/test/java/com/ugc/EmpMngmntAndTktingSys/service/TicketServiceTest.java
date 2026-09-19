@@ -1,15 +1,26 @@
 package com.ugc.EmpMngmntAndTktingSys.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ugc.EmpMngmntAndTktingSys.DTO.CreateTicketRequest;
+import com.ugc.EmpMngmntAndTktingSys.DTO.TicketResponse;
+import com.ugc.EmpMngmntAndTktingSys.DTO.UserResponse;
 import com.ugc.EmpMngmntAndTktingSys.exception.*;
+import com.ugc.EmpMngmntAndTktingSys.kafka.producer.KafkaProducerService;
+import com.ugc.EmpMngmntAndTktingSys.mapper.TicketMapper;
 import com.ugc.EmpMngmntAndTktingSys.model.*;
+import com.ugc.EmpMngmntAndTktingSys.repo.OutboxEventRepository;
 import com.ugc.EmpMngmntAndTktingSys.repo.TicketRepo;
+import com.ugc.common.event.TicketCreatedEvent;
+import com.ugc.common.model.Priority;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,16 +31,28 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class TicketServiceTest {
 
+    @Mock
+    private TicketRepo ticketRepo;
+
+    @Mock
+    private TicketMapper ticketMapper;
+
+    @Mock
+    private KafkaProducerService kafkaProducerService;
+
+    @Mock
+    private UserValidationService userValidationService;
+
+    @Mock
+    private OutboxEventRepository outboxEventRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
     @InjectMocks
     TicketService ticketService;
 
-    @Mock
-    TicketRepo ticketRepo;
-
-    @Mock
-    UserRepo userRepo;
-
-    //createTicket()
+    /*//createTicket()
     @Test
     void shouldCreateTicket(){
         //Arrange
@@ -265,4 +288,169 @@ public class TicketServiceTest {
         verify(ticketRepo).save(any(Ticket.class));
 
     }
+    */
+
+    @Test
+    void getTicketById_shouldReturnTicket_whenTicketExists(){
+        //Arrange
+        Long ticketId = 1L;
+
+        Ticket ticket = new Ticket();
+        ticket.setTicketId(ticketId);
+
+        TicketResponse expectedResponse = new TicketResponse();
+
+        when(ticketRepo.findById(ticketId))
+                .thenReturn(Optional.of(ticket));
+        when(ticketMapper.mapToTicketResponse(ticket))
+                .thenReturn(expectedResponse);
+
+        //Act
+        TicketResponse actualResponse =
+                ticketService.getTicketById(ticketId);
+
+        //Assert
+        assertEquals(expectedResponse,actualResponse);
+
+        verify(ticketRepo).findById(ticketId);
+        verify(ticketMapper).mapToTicketResponse(ticket);
+    }
+
+    @Test
+    void getTicketById_shouldThrowException_whenTicketDoesNotExist(){
+        //Arrange
+        Long ticketId = 1L;
+
+        when(ticketRepo.findById(ticketId))
+                .thenReturn(Optional.empty());
+
+        //Act + Assert
+        assertThrows(TicketNotFoundException.class,
+                ()->ticketService.getTicketById(ticketId));
+
+        verify(ticketRepo).findById(ticketId);
+
+        verify(ticketMapper,never())
+                .mapToTicketResponse(any());
+    }
+
+    @Test
+    void createTicket_shouldCreateTicketSuccessfully() throws JsonProcessingException {
+
+        // Arrange
+        String username = "Abhi";
+
+        CreateTicketRequest request = new CreateTicketRequest();
+        request.setTitle("Login Issue");
+        request.setTicketDesc("Unable to login");
+        request.setPriority(Priority.HIGH);
+
+        UserResponse user = new UserResponse();
+        user.setUserId(10L);
+
+        Ticket savedTicket = new Ticket();
+        savedTicket.setTicketId(100L);
+        savedTicket.setTitle("Login Issue");
+        savedTicket.setTicketDesc("Unable to login");
+        savedTicket.setPriority(Priority.HIGH);
+        savedTicket.setCreatedByUserId(10L);
+        savedTicket.setStatus(TicketStatus.OPEN);
+
+        TicketResponse expectedResponse = new TicketResponse();
+
+        when(userValidationService.getUser(username))
+                .thenReturn(user);
+
+        when(ticketRepo.save(any(Ticket.class)))
+                .thenReturn(savedTicket);
+
+        when(objectMapper.writeValueAsString(any(TicketCreatedEvent.class)))
+                .thenReturn("{\"ticketId\":100}");
+
+        when(ticketMapper.mapToTicketResponse(savedTicket))
+                .thenReturn(expectedResponse);
+
+
+        // Act
+        TicketResponse actualResponse =
+                ticketService.createTicket(request, username);
+
+
+        // Assert
+        assertEquals(expectedResponse, actualResponse);
+
+
+        // Verify
+        verify(userValidationService)
+                .getUser(username);
+
+        verify(ticketRepo)
+                .save(any(Ticket.class));
+
+        verify(objectMapper)
+                .writeValueAsString(any(TicketCreatedEvent.class));
+
+        verify(outboxEventRepository)
+                .save(any(OutboxEvent.class));
+
+        verify(ticketMapper)
+                .mapToTicketResponse(savedTicket);
+    }
+
+    @Test
+    void createTicket_shouldThrowException_whenEventSerializationFails()
+            throws JsonProcessingException {
+
+        // Arrange
+        String username = "Abhi";
+
+        CreateTicketRequest request = new CreateTicketRequest();
+        request.setTitle("Login Issue");
+        request.setTicketDesc("Unable to login");
+        request.setPriority(Priority.HIGH);
+
+        UserResponse user = new UserResponse();
+        user.setUserId(10L);
+
+        Ticket savedTicket = new Ticket();
+        savedTicket.setTicketId(100L);
+        savedTicket.setTitle("Login Issue");
+        savedTicket.setTicketDesc("Unable to login");
+        savedTicket.setPriority(Priority.HIGH);
+        savedTicket.setCreatedByUserId(10L);
+        savedTicket.setStatus(TicketStatus.OPEN);
+
+        when(userValidationService.getUser(username))
+                .thenReturn(user);
+
+        when(ticketRepo.save(any(Ticket.class)))
+                .thenReturn(savedTicket);
+
+        when(objectMapper.writeValueAsString(any(TicketCreatedEvent.class)))
+                .thenThrow(new JsonProcessingException("Serialization failed") {});
+
+
+        // Act + Assert
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> ticketService.createTicket(request, username)
+        );
+
+
+        // Verify exception message
+        assertEquals(
+                "Failed to serialize TicketCreatedEvent",
+                exception.getMessage()
+        );
+
+
+        // Verify Outbox was NOT saved
+        verify(outboxEventRepository, never())
+                .save(any(OutboxEvent.class));
+
+        // Mapper should also NOT be called
+        verify(ticketMapper, never())
+                .mapToTicketResponse(any());
+    }
 }
+

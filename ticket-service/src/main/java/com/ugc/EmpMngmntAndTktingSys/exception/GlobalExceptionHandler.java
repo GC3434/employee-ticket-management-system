@@ -127,4 +127,28 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
     }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailable(
+            ServiceUnavailableException ex,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.SERVICE_UNAVAILABLE,
+                request
+        );
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyRequests(
+            TooManyRequestsException ex,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.TOO_MANY_REQUESTS,
+                request
+        );
+    }
 }

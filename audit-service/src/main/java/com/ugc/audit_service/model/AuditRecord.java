@@ -6,12 +6,19 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "audit_records")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "audit_records",
+        uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_audit_ticket_action",
+                columnNames = {"ticketId","action"}
+        )
+        }
+      )
 public class AuditRecord {
 
     @Id

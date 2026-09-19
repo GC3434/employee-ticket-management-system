@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/empNtkt")
@@ -35,6 +37,11 @@ public class UserController {
     @GetMapping("/user/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/employees")
+    public ResponseEntity<List<UserResponse>> getEmployees(){
+        return ResponseEntity.ok(userService.getEmployees());
     }
 
     @GetMapping("/by-username/{userName}")

@@ -1,16 +1,19 @@
 package com.ugc.EmpMngmntAndTktingSys.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ugc.EmpMngmntAndTktingSys.DTO.CreateTicketRequest;
 import com.ugc.EmpMngmntAndTktingSys.DTO.TicketResponse;
 import com.ugc.EmpMngmntAndTktingSys.DTO.UserResponse;
-import com.ugc.EmpMngmntAndTktingSys.feign.UserClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ugc.EmpMngmntAndTktingSys.exception.*;
+import com.ugc.EmpMngmntAndTktingSys.repo.OutboxEventRepository;
 import com.ugc.common.event.TicketCreatedEvent;
 import com.ugc.EmpMngmntAndTktingSys.kafka.producer.KafkaProducerService;
 import com.ugc.EmpMngmntAndTktingSys.mapper.TicketMapper;
 import com.ugc.EmpMngmntAndTktingSys.model.*;
 import com.ugc.EmpMngmntAndTktingSys.repo.TicketRepo;
 import com.ugc.common.model.Priority;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +31,20 @@ public class TicketService {
 
     private final TicketRepo ticketRepo;
     private final TicketMapper ticketMapper;
-    private  final UserClient userClient;
     private final KafkaProducerService kafkaProducerService;
+    private final UserValidationService userValidationService;
+    private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
 
-    public TicketResponse createTicket(CreateTicketRequest ticketRequest, String username) {
+
+    @Transactional
+    public TicketResponse createTicket(
+            CreateTicketRequest ticketRequest,
+            String username) {
 
         log.info("Creating ticket for user {}", username);
 
-        UserResponse user = userClient.getUserByUsername(username);
+        UserResponse user = userValidationService.getUser(username);
 
         Ticket ticket = new Ticket();
         ticket.setTitle(ticketRequest.getTitle());
@@ -59,19 +68,42 @@ public class TicketService {
                 username,
                 savedTicket.getPriority());
 
-        kafkaProducerService.publishTicketCreatedEvent(event);
+       /* kafkaProducerService.publishTicketCreatedEvent(event);
 
         log.info("TicketCreatedEvent published for ticket {}",
+                savedTicket.getTicketId()); */
+
+        String payload;
+
+        try{
+            payload = objectMapper.writeValueAsString(event);
+        }catch (JsonProcessingException ex){
+            throw new RuntimeException("Failed to serialize TicketCreatedEvent",ex);
+        }
+
+        OutboxEvent outboxEvent = OutboxEvent.builder()
+                .eventType("TicketCreatedEvent")
+                .aggregateType("Ticket")
+                .aggregateId(savedTicket.getTicketId().toString())
+                .payload(payload)
+                .status("PENDING")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        outboxEventRepository.save(outboxEvent);
+
+        log.info("Outbox event created for ticket {}",
                 savedTicket.getTicketId());
 
         return ticketMapper.mapToTicketResponse(savedTicket);
     }
 
+
     public List<TicketResponse> getAssignedTickets(String userName) {
 
         log.info("Fetching assigned tickets for user {}", userName);
 
-        UserResponse user = userClient.getUserByUsername(userName);
+        UserResponse user = userValidationService.getUser(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByAssignedToUserIdAndStatusIn(
@@ -93,7 +125,7 @@ public class TicketService {
 
         log.info("Fetching created tickets for user {}", userName);
 
-        UserResponse user = userClient.getUserByUsername(userName);
+        UserResponse user = userValidationService.getUser(userName);
 
         Page<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserId(user.getUserId(), pageable)
@@ -114,7 +146,7 @@ public class TicketService {
                 status,
                 userName);
 
-        UserResponse user = userClient.getUserByUsername(userName);
+        UserResponse user = userValidationService.getUser(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserIdAndStatus(user.getUserId(), status)
@@ -136,7 +168,7 @@ public class TicketService {
                 priority,
                 userName);
 
-        UserResponse user = userClient.getUserByUsername(userName);
+        UserResponse user = userValidationService.getUser(userName);
 
         List<TicketResponse> tickets = ticketRepo
                 .findByCreatedByUserIdAndPriority(user.getUserId(), priority)
@@ -180,7 +212,8 @@ public class TicketService {
                     "Only OPEN tickets can be assigned.");
         }
 
-        UserResponse employee = userClient.getUserById(employeeId);
+        UserResponse employee =
+                userValidationService.getUserById(employeeId);
 
         if (!employee.getRoles().contains("ROLE_EMP")) {
 
@@ -225,7 +258,8 @@ public class TicketService {
 
         log.info("User {} is attempting to resolve ticket {}", userName, ticketId);
 
-        UserResponse user = userClient.getUserByUsername(userName);
+        UserResponse user = userValidationService.getUser(userName);
+
         Long employeeId = user.getUserId();
 
         Ticket ticket = ticketRepo.findById(ticketId)

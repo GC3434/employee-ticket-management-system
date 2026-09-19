@@ -1,7 +1,7 @@
 package com.ugc.EmpMngmntAndTktingSys.Security;
 
 import com.ugc.EmpMngmntAndTktingSys.DTO.UserResponse;
-import com.ugc.EmpMngmntAndTktingSys.feign.UserClient;
+import com.ugc.EmpMngmntAndTktingSys.service.UserValidationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,20 +13,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import lombok.extern.slf4j.Slf4j;
+
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserClient userClient;
+//    private final UserClient userClient;
+    private final UserValidationService userValidationService;
 
     public JwtAuthenticationFilter(JwtService jwtService,
-                                   UserClient userClient) {
+                                   UserValidationService userValidationService) {
         this.jwtService = jwtService;
-        this.userClient = userClient;
+        this.userValidationService = userValidationService;
     }
 
     @Override
@@ -51,7 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String username = jwtService.extractUsername(jwt);
 
-        UserResponse user = userClient.getUserByUsername(username);
+        //UserResponse user = userClient.getUserByUsername(username);
+        UserResponse user =
+                userValidationService.getUser(username);
 
         List<GrantedAuthority> authorities =
                 user.getRoles()
@@ -59,8 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .<GrantedAuthority>map(SimpleGrantedAuthority::new)
                         .toList();
 
-        System.out.println("Username: " + username);
-        System.out.println("Authorities: " + authorities);
+        log.debug("Username: {}", username);
+        log.debug("Authorities: {}", authorities);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(

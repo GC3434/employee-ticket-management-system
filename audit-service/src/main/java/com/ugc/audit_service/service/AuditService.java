@@ -15,6 +15,19 @@ public class AuditService {
     private final AuditRepo auditRepo;
 
     public void saveAudit(TicketCreatedEvent event){
+
+        String action = "CREATED";
+
+        // Check if this audit event was already processed
+        if(auditRepo.existsByTicketIdAndAction(event.getTicketId(),action)){
+            System.out.println(
+                    "Duplicate audit event detected for ticket "
+                            + event.getTicketId()
+                            + ". Skipping."
+            );
+            return;
+        }
+
         AuditRecord auditRecord = AuditRecord.builder()
                 .ticketId(event.getTicketId())
                 .action("CREATED")
@@ -22,5 +35,6 @@ public class AuditService {
                 .createdAt(LocalDateTime.now())
                 .build();
         auditRepo.save(auditRecord);
+        System.out.println("Audit saved successfully for ticket " + event.getTicketId());
     }
 }

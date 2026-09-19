@@ -3,6 +3,6 @@ package com.ugc.audit_service.repo;
 import com.ugc.audit_service.model.AuditRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AuditRepo extends JpaRepository<AuditRecord,Integer> {
-
+public interface AuditRepo extends JpaRepository<AuditRecord,Long> {
+    boolean existsByTicketIdAndAction(Long ticketId, String action);
 }

@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(
             Exception ex,
             HttpServletRequest request) {
-
+        ex.printStackTrace();
         return buildErrorResponse(
                 "Something went wrong!",
                 HttpStatus.INTERNAL_SERVER_ERROR,

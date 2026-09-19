@@ -29,20 +29,22 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(csrf->csrf.disable())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/empNtkt/register","/empNtkt/register/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/empNtkt/register", "/empNtkt/register/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/redis/**").permitAll()
                         .requestMatchers("/kafka/**").permitAll()
                         .requestMatchers("/internal/**").permitAll()
+
                         .requestMatchers("/empNtkt/admin/**")
                         .hasRole("ADMIN")
 
                         .requestMatchers("/empNtkt/manager/**")
-                        .hasAnyRole("ADMIN","MANAGER")
+                        .hasAnyRole("ADMIN", "MANAGER")
 
                         .requestMatchers("/empNtkt/employee/**")
-                        .hasAnyRole("ADMIN","MANAGER","EMP")
+                        .hasAnyRole("ADMIN", "MANAGER", "EMP")
 
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")

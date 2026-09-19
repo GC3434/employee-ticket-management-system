@@ -1,4 +1,9 @@
-FROM eclipse-temurin:26-jdk
+FROM eclipse-temurin:26-jre
+
 WORKDIR /app
+
 COPY ./target/*.jar app.jar
+
+EXPOSE 8081
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -21,18 +21,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("Gateway JWT Filter Hit");
-        System.out.println(request.getRequestURI());
-        System.out.println(request.getHeader("Authorization"));
-        System.out.println(request.getRequestURI());
-
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
         String authHeader = request.getHeader("Authorization");
 
+        System.out.println("=================================");
+        System.out.println("Gateway JWT Filter");
+        System.out.println("Method       : " + method);
+        System.out.println("URI          : " + uri);
+        System.out.println("Authorization: " + authHeader);
+        System.out.println("=================================");
+
+        // No JWT → continue normally.
+        // SecurityConfig decides whether this endpoint is public.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -60,7 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .buildDetails(request)
         );
 
-        SecurityContextHolder.getContext()
+        SecurityContextHolder
+                .getContext()
                 .setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
